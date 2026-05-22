@@ -1,47 +1,83 @@
-import tkinter as tk
-from tkinter import scrolledtext
-import datetime
+import streamlit as st
 import random
-import webbrowser
-import pyttsx3
+from datetime import datetime
 
-engine = pyttsx3.init()
+st.set_page_config(
+    page_title="CampusMate AI",
+    page_icon="🤖",
+    layout="centered"
+)
 
-root = tk.Tk()
+st.markdown("""
+<style>
 
-root.title("CampusMate AI")
+.main {
+    background-color: #0f172a;
+}
 
-root.geometry("900x700")
+.title {
+    text-align: center;
+    color: #38bdf8;
+    font-size: 45px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
 
-root.configure(bg="#0f172a")
+.user {
+    background-color: #2563eb;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    text-align: right;
+    font-size: 18px;
+}
 
-engine.setProperty('rate', 170)
+.bot {
+    background-color: #1e293b;
+    color: #22c55e;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    font-size: 18px;
+}
 
-def speak(text):
+</style>
+""", unsafe_allow_html=True)
 
-    engine.say(text)
+st.markdown(
+    '<div class="title">🤖 CampusMate AI</div>',
+    unsafe_allow_html=True
+)
 
-    engine.runAndWait()
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-def bot_response(message):
+def chatbot_response(message):
 
     text = message.lower()
 
     if "hello" in text or "hi" in text:
-
         return random.choice([
             "Hello! Welcome to CampusMate AI.",
             "Hi! How can I help you today?",
             "Hey! Nice to see you."
         ])
 
-    elif "time" in text:
+    elif "how are you" in text:
+        return "I am doing great. Thanks for asking."
 
-        return "Current time is " + datetime.datetime.now().strftime("%I:%M %p")
+    elif "your name" in text:
+        return "My name is CampusMate AI."
+
+    elif "time" in text:
+        return "Current time is " + datetime.now().strftime("%I:%M %p")
 
     elif "date" in text:
+        return "Today's date is " + datetime.now().strftime("%d-%m-%Y")
 
-        return "Today's date is " + datetime.datetime.now().strftime("%d-%m-%Y")
+    elif "day" in text:
+        return "Today is " + datetime.now().strftime("%A")
 
     elif "joke" in text:
 
@@ -53,193 +89,101 @@ def bot_response(message):
 
         return random.choice(jokes)
 
-    elif "motivate" in text:
-
-        return "Success starts with consistency. Keep learning every day."
+    elif "motivate" in text or "motivation" in text:
+        return "Success comes from consistency and hard work."
 
     elif "sad" in text or "stress" in text:
-
-        return "Take a deep breath. Small progress every day leads to success."
-
-    elif "weather" in text:
-
-        return "Today's weather is pleasant and sunny."
-
-    elif "open youtube" in text:
-
-        webbrowser.open("https://youtube.com")
-
-        return "Opening YouTube"
-
-    elif "open google" in text:
-
-        webbrowser.open("https://google.com")
-
-        return "Opening Google"
+        return "Take a small break and relax. Everything will be okay."
 
     elif "python" in text:
+        return "Python is a powerful programming language."
 
-        return "Python is a powerful programming language used in AI and web development."
+    elif "java" in text:
+        return "Java is widely used for software development."
+
+    elif "html" in text:
+        return "HTML is used to create webpages."
+
+    elif "css" in text:
+        return "CSS is used to style webpages beautifully."
+
+    elif "javascript" in text:
+        return "JavaScript makes websites interactive."
 
     elif "ai" in text:
+        return "Artificial Intelligence allows machines to learn and think."
 
-        return "Artificial Intelligence helps machines think and learn like humans."
+    elif "machine learning" in text:
+        return "Machine Learning helps systems learn from data."
+
+    elif "deep learning" in text:
+        return "Deep Learning uses neural networks for AI tasks."
+
+    elif "weather" in text:
+        return "Today's weather is pleasant and sunny."
+
+    elif "food" in text:
+        return "Pizza and biryani are popular favorite foods."
+
+    elif "movie" in text:
+        return "Interstellar is a great science fiction movie."
+
+    elif "music" in text:
+        return "Music helps people relax and feel motivated."
+
+    elif "study" in text:
+        return "Daily practice and revision improve learning."
 
     elif "exam" in text:
+        return "Practice previous papers and revise important concepts."
 
-        return "Practice previous papers and revise important concepts regularly."
+    elif "project" in text:
+        return "AI and web projects are excellent for portfolios."
+
+    elif "github" in text:
+        return "GitHub is used to host and manage coding projects."
+
+    elif "linkedin" in text:
+        return "LinkedIn helps showcase your skills professionally."
 
     elif "bye" in text:
-
         return "Goodbye! Have a wonderful day."
+
+    elif "thank you" in text:
+        return "You are welcome."
 
     else:
 
-        return "Sorry, I did not understand that."
+        return random.choice([
+            "Interesting question.",
+            "Can you explain more?",
+            "I am still learning that.",
+            "Please ask another question.",
+            "That sounds interesting."
+        ])
 
-def loading_animation():
+user_input = st.chat_input("Type your message here...")
 
-    chat_area.insert(tk.END, "\nCampusMate AI is typing")
+if user_input:
 
-    root.update()
+    st.session_state.messages.append(("user", user_input))
 
-    for i in range(3):
+    response = chatbot_response(user_input)
 
-        chat_area.insert(tk.END, ".")
+    st.session_state.messages.append(("bot", response))
 
-        root.update()
+for sender, message in st.session_state.messages:
 
-        root.after(250)
+    if sender == "user":
 
-def send_message():
+        st.markdown(
+            f'<div class="user">{message}</div>',
+            unsafe_allow_html=True
+        )
 
-    user_message = entry_box.get()
+    else:
 
-    if user_message.strip() == "":
-
-        return
-
-    chat_area.config(state=tk.NORMAL)
-
-    chat_area.insert(tk.END, "\n\nYou: ", "user")
-
-    chat_area.insert(tk.END, user_message)
-
-    response = bot_response(user_message)
-
-    loading_animation()
-
-    chat_area.insert(tk.END, "\nCampusMate AI: ", "bot")
-
-    chat_area.insert(tk.END, response)
-
-    chat_area.config(state=tk.DISABLED)
-
-    chat_area.yview(tk.END)
-
-    entry_box.delete(0, tk.END)
-
-    speak(response)
-
-header = tk.Frame(root, bg="#1e293b", height=90)
-
-header.pack(fill=tk.X)
-
-logo = tk.Label(
-    header,
-    text="CampusMate AI",
-    bg="#1e293b",
-    fg="#38bdf8",
-    font=("Arial", 28, "bold")
-)
-
-logo.pack(pady=20)
-
-chat_frame = tk.Frame(root, bg="#0f172a")
-
-chat_frame.pack(
-    padx=20,
-    pady=20,
-    fill=tk.BOTH,
-    expand=True
-)
-
-chat_area = scrolledtext.ScrolledText(
-    chat_frame,
-    wrap=tk.WORD,
-    font=("Arial", 14),
-    bg="#111827",
-    fg="white",
-    insertbackground="white",
-    relief=tk.FLAT,
-    padx=20,
-    pady=20
-)
-
-chat_area.pack(fill=tk.BOTH, expand=True)
-
-chat_area.config(state=tk.DISABLED)
-
-chat_area.tag_config(
-    "user",
-    foreground="#38bdf8",
-    font=("Arial", 14, "bold")
-)
-
-chat_area.tag_config(
-    "bot",
-    foreground="#22c55e",
-    font=("Arial", 14, "bold")
-)
-
-bottom_frame = tk.Frame(root, bg="#0f172a")
-
-bottom_frame.pack(
-    fill=tk.X,
-    padx=20,
-    pady=20
-)
-
-entry_box = tk.Entry(
-    bottom_frame,
-    font=("Arial", 16),
-    bg="#1e293b",
-    fg="white",
-    insertbackground="white",
-    relief=tk.FLAT
-)
-
-entry_box.pack(
-    side=tk.LEFT,
-    fill=tk.X,
-    expand=True,
-    ipady=14,
-    padx=(0, 10)
-)
-
-send_button = tk.Button(
-    bottom_frame,
-    text="Send",
-    font=("Arial", 16, "bold"),
-    bg="#38bdf8",
-    fg="white",
-    activebackground="#0ea5e9",
-    relief=tk.FLAT,
-    padx=25,
-    pady=10,
-    command=send_message
-)
-
-send_button.pack(side=tk.RIGHT)
-
-welcome_message = "Welcome to CampusMate AI! Ask me anything."
-
-chat_area.config(state=tk.NORMAL)
-
-chat_area.insert(tk.END, "CampusMate AI: ", "bot")
-
-chat_area.insert(tk.END, welcome_message)
-
-chat_area.config(state=tk.DISABLED)
-
-root.mainloop()
+        st.markdown(
+            f'<div class="bot">🤖 {message}</div>',
+            unsafe_allow_html=True
+        )
